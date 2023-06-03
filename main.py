@@ -65,7 +65,7 @@ def main():
     cap = cv2.VideoCapture(0)
     cap.set(3, 640)
     cap.set(4, 480)
-    tracker = handTracker()
+    tracker = handTracker(maxHands=1)
 
     while True:
         success,image = cap.read()
