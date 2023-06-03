@@ -1,6 +1,11 @@
 import cv2
 import mediapipe as mp
 import time
+import math
+import numpy as np
+#Volume Control by PyCAW
+from comtypes import CLSCTX_ALL
+from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
 #----------------------------------------------------------------
 #Hand Tracking Module
@@ -42,6 +47,16 @@ class handTracker():
         return lmlist
 #----------------------------------------------------------------
 
+#----------------------------------------------------------------
+#Volume Control Module
+#----------------------------------------------------------------
+devices = AudioUtilities.GetSpeakers()
+interface = devices.Activate(
+    IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+volume = interface.QueryInterface(IAudioEndpointVolume)
+
+def VolumeControl(lmList, image, draw=True):
+    pass
 
 #---------------------------------------------------------------
 #Main Function
@@ -56,9 +71,28 @@ def main():
         success,image = cap.read()
         image = tracker.handsFinder(image)
         lmList = tracker.positionFinder(image)
+        volumeRange = volume.GetVolumeRange()
+        minVol = volumeRange[0]
+        maxVol = volumeRange[1]
         if len(lmList) != 0:
-            print(lmList)
-            print(len(lmList))
+            #print(len(lmList))         #21 points per hand
+            
+            #Volume Control
+            xp, yp = lmList[8][1], lmList[8][2]
+            xpinky_tip, ypinky_tip = lmList[20][1], lmList[20][2]
+            xpinky_mcp, ypinky_mcp = lmList[17][1], lmList[17][2]
+            xt,yt = lmList[4][1], lmList[4][2]
+            length1 = math.hypot(xt-xp,yt-yp)
+            length2 = math.hypot(xpinky_tip-xpinky_mcp,ypinky_tip-ypinky_mcp)
+            cv2.circle(image,(xp,yp), 15 , (255,0,255), cv2.FILLED)
+            cv2.circle(image,(xt,yt), 15 , (255,0,255), cv2.FILLED)
+            vol = np.interp(length1,[50,143],[minVol,maxVol])
+            if length2 < 13:
+                volume.SetMasterVolumeLevel(vol, None)
+                cv2.circle(image,(xp,yp), 15 , (0,255,0), cv2.FILLED)
+                cv2.circle(image,(xt,yt), 15 , (0,255,0), cv2.FILLED)
+                
+
         cv2.imshow("Video",image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
