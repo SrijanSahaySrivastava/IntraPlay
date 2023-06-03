@@ -33,6 +33,16 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
     
+    def fingersUp(self, lmList):
+        fingers = []
+        fingerTips= [8,12,16,20]
+        for tip in fingerTips:
+            if lmList[tip][2] < lmList[tip-2][2]:
+                fingers.append(1)
+            else:
+                fingers.append(0)
+        return fingers
+    
     def positionFinder(self,image, handNo=0, draw=True):
         lmlist = []
         if self.results.multi_hand_landmarks:
@@ -54,9 +64,26 @@ devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(
     IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 volume = interface.QueryInterface(IAudioEndpointVolume)
+#volume.GetMute()
+#---------------------------------------------------------------
 
-def VolumeControl(lmList, image, draw=True):
+
+#---------------------------------------------------------------
+#Video Control
+#---------------------------------------------------------------
+def VideoPlay():
     pass
+
+def VideoPause():
+    pass
+
+def VideoStop():
+    pass
+
+def VideoForward():
+    pass
+#---------------------------------------------------------------
+
 
 #---------------------------------------------------------------
 #Main Function
@@ -65,7 +92,7 @@ def main():
     cap = cv2.VideoCapture(0)
     cap.set(3, 640)
     cap.set(4, 480)
-    tracker = handTracker(maxHands=1)
+    tracker = handTracker(maxHands=1, detectionCon=0.8)
 
     while True:
         success,image = cap.read()
@@ -77,20 +104,36 @@ def main():
         if len(lmList) != 0:
             #print(len(lmList))         #21 points per hand
             
-            #Volume Control
+            #Fingers Up-------------------------------------------------------
+            fingers = tracker.fingersUp(lmList)
+            print(fingers)
+            #----------------------------------------------------------------
+            
+            
+            
+            
+            #Volume Control-----------------------------------------------------
             xp, yp = lmList[8][1], lmList[8][2]
             xpinky_tip, ypinky_tip = lmList[20][1], lmList[20][2]
             xpinky_mcp, ypinky_mcp = lmList[17][1], lmList[17][2]
             xt,yt = lmList[4][1], lmList[4][2]
             length1 = math.hypot(xt-xp,yt-yp)
-            length2 = math.hypot(xpinky_tip-xpinky_mcp,ypinky_tip-ypinky_mcp)
+            #length2 = math.hypot(xpinky_tip-xpinky_mcp,ypinky_tip-ypinky_mcp)
             cv2.circle(image,(xp,yp), 15 , (255,0,255), cv2.FILLED)
             cv2.circle(image,(xt,yt), 15 , (255,0,255), cv2.FILLED)
             vol = np.interp(length1,[50,143],[minVol,maxVol])
-            if length2 < 13:
+            if fingers[3] == 0 and fingers[2] == 0 and fingers[1] == 0:
                 volume.SetMasterVolumeLevel(vol, None)
                 cv2.circle(image,(xp,yp), 15 , (0,255,0), cv2.FILLED)
                 cv2.circle(image,(xt,yt), 15 , (0,255,0), cv2.FILLED)
+                
+            # xMFT, yMFT = lmList[12][1], lmList[12][2]
+            # xW, yW = lmList[0][1], lmList[0][2]
+            # length2 = math.hypot(xW-xMFT,yW-yMFT)
+            # print(length2)
+            # if length2 < 80:
+            #     volume.GetMute()
+            #-------------------------------------------------------------------
                 
 
         cv2.imshow("Video",image)
