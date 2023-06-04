@@ -3,11 +3,17 @@ import mediapipe as mp
 import time
 import math
 import numpy as np
+# from videoplayer import VideoPlayer
+import tkinter as tk
+import pyautogui
+
+# player = VideoPlayer(tk.Tk())
 #Volume Control by PyCAW
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 map_face_mesh = mp.solutions.face_mesh
 # variables 
+
 frame_counter =0
 CEF_COUNTER =0
 TOTAL_BLINKS =0
@@ -254,6 +260,7 @@ class handTracker():
         return lmlist
 #----------------------------------------------------------------
 
+
 #----------------------------------------------------------------
 #Volume Control Module
 #----------------------------------------------------------------
@@ -268,10 +275,15 @@ volume = interface.QueryInterface(IAudioEndpointVolume)
 #---------------------------------------------------------------
 #Video Control
 #---------------------------------------------------------------
-def VideoPlay():
+def VideoPlay(player, is_playing):
+
+    # player.root.mainloop()
+    is_playing = 1
+    
     print("Video Play")
 
 def VideoPause():
+    pyautogui.press('space')
     print("Video Pause")
 
 def VideoStop():
@@ -286,8 +298,9 @@ def VideoForward():
 #Main Function
 #---------------------------------------------------------------
 def main():
+    is_playing = 0
     with map_face_mesh.FaceMesh(min_detection_confidence =0.5, min_tracking_confidence=0.5) as face_mesh:
-
+        
         cap = cv2.VideoCapture(0)
         cap.set(3, 640)
         cap.set(4, 480)
@@ -327,14 +340,15 @@ def main():
                         eye.start = time.time()
                         
                     if time.time() - eye.start > 20:
-                        #VideoStop()
-                        eye.end = 1
+                        VideoStop()
+                        start = 0
                 else:
-                    eye.start = 0
                     VideoPlay()
             else:
                 print("No Face Found")
-                VideoPause()
+                pyautogui.press('space')
+                print("Space Pressed pause")
+                is_playing = 0
             #----------------------------------------------------------------
                 
             #print(ratio, mesh_coords)
@@ -346,9 +360,13 @@ def main():
                 #print(fingers)
                 #----------------------------------------------------------------
                 
-                
-                
-                
+                if fingers[1] == 0 and fingers[2] == 0:
+                    pyautogui.press('space')
+                    time.sleep(2)
+
+                if fingers[1] ==0 and fingers[2]== 0 and fingers[3] ==0 and fingers[0] == 0:
+                    pyautogui.press('f')
+                    time.sleep(2)
                 #Volume Control-----------------------------------------------------
                 xp, yp = lmList[8][1], lmList[8][2]
                 xpinky_tip, ypinky_tip = lmList[20][1], lmList[20][2]
