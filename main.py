@@ -334,17 +334,16 @@ def main():
                 eye_position = eye.positionEstimator(crop_right)
                 eye_position_left= eye.positionEstimator(crop_left)
                 #print(eye_position, eye_position_left)
-                if eye_position != "CENTER" and eye_position_left != "CENTER":
-                    VideoPause()
-                    if eye.start == 0:
-                        eye.start = time.time()
-                        
-                    if time.time() - eye.start > 20:
-                        VideoStop()
-                        start = 0
-                else:
-                    VideoPlay()
-            else:
+                if eye_position != "CENTER" and eye_position_left != "CENTER" and is_playing == 1:
+                    pyautogui.press('space')
+                    print("Space Pressed pause")
+                    is_playing = 0
+                if eye_position == "CENTER" and eye_position_left == "CENTER" and is_playing == 0:
+                    pyautogui.press('space')
+                    print("Space Pressed play")
+                    is_playing = 1
+                
+            elif is_playing == 1:
                 print("No Face Found")
                 pyautogui.press('space')
                 print("Space Pressed pause")
@@ -360,13 +359,13 @@ def main():
                 #print(fingers)
                 #----------------------------------------------------------------
                 
-                if fingers[1] == 0 and fingers[2] == 0:
+                if fingers[0]==1 and fingers[1] == 0 and fingers[2] == 0 and fingers[3] == 1:
                     pyautogui.press('space')
-                    time.sleep(2)
+                    time.sleep(0.5)
 
                 if fingers[1] ==0 and fingers[2]== 0 and fingers[3] ==0 and fingers[0] == 0:
                     pyautogui.press('f')
-                    time.sleep(2)
+                    time.sleep(0.5)
                 #Volume Control-----------------------------------------------------
                 xp, yp = lmList[8][1], lmList[8][2]
                 xpinky_tip, ypinky_tip = lmList[20][1], lmList[20][2]
