@@ -327,9 +327,10 @@ def main():
                         eye.start = time.time()
                         
                     if time.time() - eye.start > 20:
-                        VideoStop()
-                        start = 0
+                        #VideoStop()
+                        eye.end = 1
                 else:
+                    eye.start = 0
                     VideoPlay()
             else:
                 print("No Face Found")
