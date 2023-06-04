@@ -35,7 +35,8 @@ Note:- Still work in progress please raise issue if you encounter one! Thank You
     
 ## Demo
 
-https://www.youtube.com/watch?v=V8_kO_lyXtI
+[https://www.youtube.com/watch?v=V8_kO_lyXtI](https://www.youtube.com/watch?v=9dedyIB417I)
+
 ## Authors
 
 - [@SrijanSahaySrivastava](https://github.com/SrijanSahaySrivastava)
