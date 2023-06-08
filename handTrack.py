@@ -25,6 +25,16 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
     
+    def fingersUp(self, lmList):
+        fingers = []
+        fingerTips= [8,12,16,20]
+        for tip in fingerTips:
+            if lmList[tip][2] < lmList[tip-2][2]:
+                fingers.append(1)
+            else:
+                fingers.append(0)
+        return fingers
+    
     def positionFinder(self,image, handNo=0, draw=True):
         lmlist = []
         if self.results.multi_hand_landmarks:
